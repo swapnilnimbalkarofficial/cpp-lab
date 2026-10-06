@@ -1,0 +1,1541 @@
+/*
+Q 1:
+Develop a hospital management system using file handling
+create a class patient with following data members
+1 PatientId, 2 Patient name 3 age, 4 disease 5 doctor name 6 hospital charges
+the program should provide the following operations;
+- add ne wpatient record
+- display all patient records
+- serach for a patient by petient ID
+- update patient info
+- delete a patient record
+- store all records permanently in a file
+*/
+
+#include <iostream>
+#include <fstream>
+#include <cstdio>
+#include <string>
+using namespace std;
+
+class Patient
+{
+    int patientId;
+    string patientName;
+    int age;
+    string disease;
+    string doctorName;
+    double hospitalCharges;
+
+public:
+
+    // Add new patient
+    void addPatient()
+    {
+        cout << "\nEnter Patient ID: "; cin >> patientId;
+
+        cout << "Enter Patient Name: "; cin >> patientName;
+
+        cout << "Enter Age: "; cin >> age;
+
+        cout << "Enter Disease: "; cin >> disease;
+
+        cout << "Enter Doctor Name: "; cin >> doctorName;
+
+        cout << "Enter Hospital Charges: "; cin >> hospitalCharges;
+
+        ofstream file("patient.txt", ios::app);
+
+        if (!file)
+        {
+            cout << "Error opening file!\n";
+            return;
+        }
+
+        file << patientId << " "<< patientName << " "
+             << age << " "<< disease << " "<< doctorName << " "
+             << hospitalCharges << endl;
+
+        file.close();
+
+        cout << "Patient record added successfully.\n";
+    }
+
+    // Display one patient
+    void displayPatient()
+    {
+        cout << "\nPatient ID       : " << patientId;
+        cout << "\nPatient Name     : " << patientName;
+        cout << "\nAge              : " << age;
+        cout << "\nDisease          : " << disease;
+        cout << "\nDoctor Name      : " << doctorName;
+        cout << "\nHospital Charges : " << hospitalCharges;
+        cout << "\n-----------------------------\n";
+    }
+
+    // Display all patients
+    void displayAll()
+    {
+        ifstream file("patient.txt");
+
+        if (!file)
+        {
+            cout << "No records found.\n";
+            return;
+        }
+
+        Patient p;
+
+        while (file >> p.patientId>> p.patientName
+                    >> p.age>> p.disease
+                    >> p.doctorName>> p.hospitalCharges)
+        {
+            p.displayPatient();
+        }
+
+        file.close();
+    }
+
+    // Search patient by ID
+    void searchPatient()
+    {
+        int id;
+        bool found = false;
+
+        cout << "Enter Patient ID to search: "; cin >> id;
+
+        ifstream file("patient.txt");
+
+        if (!file)
+        {
+            cout << "File not found.\n";
+            return;
+        }
+
+        Patient p;
+
+        while (file >> p.patientId>> p.patientName
+                    >> p.age>> p.disease
+                    >> p.doctorName>> p.hospitalCharges)
+        {
+            if (p.patientId == id)
+            {
+                cout << "\nPatient Found:\n";
+                p.displayPatient();
+                found = true;
+                break;
+            }
+        }
+
+        file.close();
+
+        if (!found)
+        {
+            cout << "Patient not found.\n";
+        }
+    }
+
+    // Update patient
+    void updatePatient()
+    {
+        int id;
+        bool found = false;
+
+        cout << "Enter Patient ID to update: "; cin >> id;
+
+        ifstream file("patient.txt");
+        ofstream temp("temp.txt");
+
+        if (!file || !temp)
+        {
+            cout << "Error opening file.\n";
+            return;
+        }
+
+        Patient p;
+
+        while (file >> p.patientId>> p.patientName
+                    >> p.age>> p.disease
+                    >> p.doctorName>> p.hospitalCharges)
+        {
+            if (p.patientId == id)
+            {
+                found = true;
+
+                cout << "\nEnter New Patient Name: "; cin >> p.patientName;
+
+                cout << "Enter New Age: "; cin >> p.age;
+
+                cout << "Enter New Disease: "; cin >> p.disease;
+
+                cout << "Enter New Doctor Name: "; cin >> p.doctorName;
+
+                cout << "Enter New Hospital Charges: "; cin >> p.hospitalCharges;
+            }
+
+            temp << p.patientId << " " << p.patientName << " "
+                 << p.age << " " << p.disease << " "
+                 << p.doctorName << " "<< p.hospitalCharges << endl;
+        }
+
+        file.close();
+        temp.close();
+
+        remove("patient.txt");
+        rename("temp.txt", "patient.txt");
+
+        if (found)
+            cout << "Patient record updated successfully.\n";
+        else
+            cout << "Patient not found.\n";
+    }
+
+    // Delete patient
+    void deletePatient()
+    {
+        int id;
+        bool found = false;
+
+        cout << "Enter Patient ID to delete: "; cin >> id;
+
+        ifstream file("patient.txt");
+        ofstream temp("temp.txt");
+
+        if (!file || !temp)
+        {
+            cout << "Error opening file.\n";
+            return;
+        }
+
+        Patient p;
+
+        while (file >> p.patientId >> p.patientName
+                    >> p.age >> p.disease
+                    >> p.doctorName >> p.hospitalCharges)
+        {
+            if (p.patientId == id)
+            {
+                found = true;
+                // Do not write this record
+                continue;
+            }
+
+            temp << p.patientId << " " << p.patientName << " "
+                 << p.age << " " << p.disease << " "
+                 << p.doctorName << " " << p.hospitalCharges << endl;
+        }
+
+        file.close();
+        temp.close();
+
+        remove("patient.txt");
+        rename("temp.txt", "patient.txt");
+
+        if (found)
+            cout << "Patient record deleted successfully.\n";
+        else
+            cout << "Patient not found.\n";
+    }
+};
+
+int main()
+{
+    Patient p;
+    int choice;
+
+    do
+    {
+        cout << "\n\n===== HOSPITAL MANAGEMENT SYSTEM =====";
+        cout << "\n1. Add New Patient \n2. Display All Patients \n3. Search Patient \n4. Update Patient \n5. Delete Patient";
+        cout << "\n6. Exit";
+
+        cout << "\nEnter your choice: ";
+        cin >> choice;
+
+        switch (choice)
+        {
+        case 1:
+            p.addPatient();
+            break;
+
+        case 2:
+            p.displayAll();
+            break;
+
+        case 3:
+            p.searchPatient();
+            break;
+
+        case 4:
+            p.updatePatient();
+            break;
+
+        case 5:
+            p.deletePatient();
+            break;
+
+        case 6:
+            cout << "Thank you!\n";
+            break;
+
+        default:
+            cout << "Invalid choice!\n";
+        }
+
+    } while (choice != 6);
+
+    return 0;
+}
+-------------------------------------------------
+/*
+Q.2: develop a menu driven stock management system using classes and file handling
+create a classs named stock containing the following data members:
+- product ID, product name, category, price, quantity, supplier name
+the system should store all product records permanently in a file named stock.txt.
+the program should provide the following menu options:
+1 add product - add new product to stock
+2 display all products - display all products stored in the file
+3 search product - search for a product using productID
+4 update product - modify the details of an exisitng product
+5 delete product - delete a product from stock
+6 purchase stock - increase the quantity of product
+7 sell stock - decrease the quantity of a product
+8 calculate stock value - calculate the total value of all available stock.
+*/
+#include <iostream>
+#include <fstream>
+#include <cstdio>
+#include <string>
+using namespace std;
+
+class Stock
+{
+    int productId;
+    string productName;
+    string category;
+    double price;
+    int quantity;
+    string supplierName;
+
+public:
+
+    // Add new product
+    void addProduct()
+    {
+        cout << "\nEnter Product ID: ";
+        cin >> productId;
+
+        cout << "Enter Product Name: ";
+        cin >> productName;
+
+        cout << "Enter Category: ";
+        cin >> category;
+
+        cout << "Enter Price: ";
+        cin >> price;
+
+        cout << "Enter Quantity: ";
+        cin >> quantity;
+
+        cout << "Enter Supplier Name: ";
+        cin >> supplierName;
+
+        ofstream file("stock.txt", ios::app);
+
+        if (!file)
+        {
+            cout << "Error opening file!\n";
+            return;
+        }
+
+        file << productId << " "
+             << productName << " "
+             << category << " "
+             << price << " "
+             << quantity << " "
+             << supplierName << endl;
+
+        file.close();
+
+        cout << "Product added successfully.\n";
+    }
+
+
+    // Display one product
+    void displayProduct()
+    {
+        cout << "\nProduct ID    : " << productId;
+        cout << "\nProduct Name  : " << productName;
+        cout << "\nCategory      : " << category;
+        cout << "\nPrice         : " << price;
+        cout << "\nQuantity      : " << quantity;
+        cout << "\nSupplier Name : " << supplierName;
+        cout << "\n-----------------------------\n";
+    }
+
+
+    // Display all products
+    void displayAll()
+    {
+        ifstream file("stock.txt");
+
+        if (!file)
+        {
+            cout << "No records found.\n";
+            return;
+        }
+
+        Stock s;
+
+        while (file >> s.productId
+                    >> s.productName
+                    >> s.category
+                    >> s.price
+                    >> s.quantity
+                    >> s.supplierName)
+        {
+            s.displayProduct();
+        }
+
+        file.close();
+    }
+
+
+    // Search product
+    void searchProduct()
+    {
+        int id;
+        bool found = false;
+
+        cout << "Enter Product ID to search: ";
+        cin >> id;
+
+        ifstream file("stock.txt");
+
+        if (!file)
+        {
+            cout << "File not found.\n";
+            return;
+        }
+
+        Stock s;
+
+        while (file >> s.productId
+                    >> s.productName
+                    >> s.category
+                    >> s.price
+                    >> s.quantity
+                    >> s.supplierName)
+        {
+            if (s.productId == id)
+            {
+                cout << "\nProduct Found:\n";
+                s.displayProduct();
+
+                found = true;
+                break;
+            }
+        }
+
+        file.close();
+
+        if (!found)
+            cout << "Product not found.\n";
+    }
+
+
+    // Update product
+    void updateProduct()
+    {
+        int id;
+        bool found = false;
+
+        cout << "Enter Product ID to update: ";
+        cin >> id;
+
+        ifstream file("stock.txt");
+        ofstream temp("temp.txt");
+
+        if (!file || !temp)
+        {
+            cout << "Error opening file.\n";
+            return;
+        }
+
+        Stock s;
+
+        while (file >> s.productId
+                    >> s.productName
+                    >> s.category
+                    >> s.price
+                    >> s.quantity
+                    >> s.supplierName)
+        {
+            if (s.productId == id)
+            {
+                found = true;
+
+                cout << "\nEnter New Product Name: ";
+                cin >> s.productName;
+
+                cout << "Enter New Category: ";
+                cin >> s.category;
+
+                cout << "Enter New Price: ";
+                cin >> s.price;
+
+                cout << "Enter New Quantity: ";
+                cin >> s.quantity;
+
+                cout << "Enter New Supplier Name: ";
+                cin >> s.supplierName;
+            }
+
+            temp << s.productId << " "
+                 << s.productName << " "
+                 << s.category << " "
+                 << s.price << " "
+                 << s.quantity << " "
+                 << s.supplierName << endl;
+        }
+
+        file.close();
+        temp.close();
+
+        remove("stock.txt");
+        rename("temp.txt", "stock.txt");
+
+        if (found)
+            cout << "Product updated successfully.\n";
+        else
+            cout << "Product not found.\n";
+    }
+
+
+    // Delete product
+    void deleteProduct()
+    {
+        int id;
+        bool found = false;
+
+        cout << "Enter Product ID to delete: ";
+        cin >> id;
+
+        ifstream file("stock.txt");
+        ofstream temp("temp.txt");
+
+        if (!file || !temp)
+        {
+            cout << "Error opening file.\n";
+            return;
+        }
+
+        Stock s;
+
+        while (file >> s.productId
+                    >> s.productName
+                    >> s.category
+                    >> s.price
+                    >> s.quantity
+                    >> s.supplierName)
+        {
+            if (s.productId == id)
+            {
+                found = true;
+                continue;
+            }
+
+            temp << s.productId << " "
+                 << s.productName << " "
+                 << s.category << " "
+                 << s.price << " "
+                 << s.quantity << " "
+                 << s.supplierName << endl;
+        }
+
+        file.close();
+        temp.close();
+
+        remove("stock.txt");
+        rename("temp.txt", "stock.txt");
+
+        if (found)
+            cout << "Product deleted successfully.\n";
+        else
+            cout << "Product not found.\n";
+    }
+
+
+    // Purchase stock
+    void purchaseStock()
+    {
+        int id;
+        int purchaseQty;
+        bool found = false;
+
+        cout << "Enter Product ID: ";
+        cin >> id;
+
+        cout << "Enter Quantity to Purchase: ";
+        cin >> purchaseQty;
+
+        ifstream file("stock.txt");
+        ofstream temp("temp.txt");
+
+        if (!file || !temp)
+        {
+            cout << "Error opening file.\n";
+            return;
+        }
+
+        Stock s;
+
+        while (file >> s.productId
+                    >> s.productName
+                    >> s.category
+                    >> s.price
+                    >> s.quantity
+                    >> s.supplierName)
+        {
+            if (s.productId == id)
+            {
+                s.quantity += purchaseQty;
+                found = true;
+            }
+
+            temp << s.productId << " "
+                 << s.productName << " "
+                 << s.category << " "
+                 << s.price << " "
+                 << s.quantity << " "
+                 << s.supplierName << endl;
+        }
+
+        file.close();
+        temp.close();
+
+        remove("stock.txt");
+        rename("temp.txt", "stock.txt");
+
+        if (found)
+            cout << "Stock purchased successfully.\n";
+        else
+            cout << "Product not found.\n";
+    }
+
+
+    // Sell stock
+    void sellStock()
+    {
+        int id;
+        int sellQty;
+        bool found = false;
+
+        cout << "Enter Product ID: ";
+        cin >> id;
+
+        cout << "Enter Quantity to Sell: ";
+        cin >> sellQty;
+
+        ifstream file("stock.txt");
+        ofstream temp("temp.txt");
+
+        if (!file || !temp)
+        {
+            cout << "Error opening file.\n";
+            return;
+        }
+
+        Stock s;
+
+        while (file >> s.productId
+                    >> s.productName
+                    >> s.category
+                    >> s.price
+                    >> s.quantity
+                    >> s.supplierName)
+        {
+            if (s.productId == id)
+            {
+                found = true;
+
+                if (sellQty <= s.quantity)
+                {
+                    s.quantity -= sellQty;
+                }
+                else
+                {
+                    cout << "Insufficient stock!\n";
+                }
+            }
+
+            temp << s.productId << " "
+                 << s.productName << " "
+                 << s.category << " "
+                 << s.price << " "
+                 << s.quantity << " "
+                 << s.supplierName << endl;
+        }
+
+        file.close();
+        temp.close();
+
+        remove("stock.txt");
+        rename("temp.txt", "stock.txt");
+
+        if (!found)
+            cout << "Product not found.\n";
+        else
+            cout << "Stock updated successfully.\n";
+    }
+
+
+    // Calculate total stock value
+    void calculateStockValue()
+    {
+        ifstream file("stock.txt");
+
+        if (!file)
+        {
+            cout << "File not found.\n";
+            return;
+        }
+
+        double totalValue = 0;
+
+        Stock s;
+
+        while (file >> s.productId
+                    >> s.productName
+                    >> s.category
+                    >> s.price
+                    >> s.quantity
+                    >> s.supplierName)
+        {
+            totalValue += s.price * s.quantity;
+        }
+
+        file.close();
+
+        cout << "\nTotal Stock Value = " << totalValue << endl;
+    }
+};
+
+
+int main()
+{
+    Stock s;
+    int choice;
+
+    do
+    {
+        cout << "\n\n========== STOCK MANAGEMENT SYSTEM ==========";
+        cout << "\n1. Add Product";
+        cout << "\n2. Display All Products";
+        cout << "\n3. Search Product";
+        cout << "\n4. Update Product";
+        cout << "\n5. Delete Product";
+        cout << "\n6. Purchase Stock";
+        cout << "\n7. Sell Stock";
+        cout << "\n8. Calculate Stock Value";
+        cout << "\n9. Exit";
+
+        cout << "\nEnter your choice: ";
+        cin >> choice;
+
+        switch (choice)
+        {
+        case 1:
+            s.addProduct();
+            break;
+
+        case 2:
+            s.displayAll();
+            break;
+
+        case 3:
+            s.searchProduct();
+            break;
+
+        case 4:
+            s.updateProduct();
+            break;
+
+        case 5:
+            s.deleteProduct();
+            break;
+
+        case 6:
+            s.purchaseStock();
+            break;
+
+        case 7:
+            s.sellStock();
+            break;
+
+        case 8:
+            s.calculateStockValue();
+            break;
+
+        case 9:
+            cout << "Thank you!\n";
+            break;
+
+        default:
+            cout << "Invalid choice!\n";
+        }
+
+    } while (choice != 9);
+
+    return 0;
+}
+----------------------------------------------------
+/*
+Q.3:  Mini Project: Library Book Management System
+Problem Statement
+Develop a Library Book Management System in C++ using Object-Oriented Programming
+(OOP) concepts.
+The system should allow a librarian to store and manage information about books in a library.
+Each book should have details such as book ID, title, author, and availability status.
+Create a class named Book with appropriate data members and member functions.
+Requirements
+Your program should:
+Create a Book class containing: bookId, title, author, isAvailable
+Implement:
+1. Default constructor to initialize a book with default values.
+2. Parameterized constructor to initialize book details when an object is created.
+3. Destructor that displays a message when a book object is destroyed.
+4. A function displayBook() to display book information.
+5. A function issueBook() to issue a book if it is available.
+6. A function returnBook() to mark an issued book as available.
+*/
+
+#include <iostream>
+#include <string>
+using namespace std;
+
+class Book
+{
+    int bookId;
+    string title;
+    string author;
+    bool isAvailable;
+
+public:
+
+    // Default constructor
+    Book()
+    {
+        bookId = 0;
+        title = "Unknown";
+        author = "Unknown";
+        isAvailable = true;
+    }
+
+
+    // Parameterized constructor
+    Book(int id, string t, string a, bool status)
+    {
+        bookId = id;
+        title = t;
+        author = a;
+        isAvailable = status;
+    }
+
+
+    // Destructor
+    ~Book()
+    {
+        cout << "Book object destroyed: " << bookId << endl;
+    }
+
+
+    // Display book information
+    void displayBook()
+    {
+        cout << "\nBook ID     : " << bookId;
+        cout << "\nTitle       : " << title;
+        cout << "\nAuthor      : " << author;
+
+        if (isAvailable)
+            cout << "\nStatus      : Available";
+        else
+            cout << "\nStatus      : Issued";
+
+        cout << "\n-------------------------\n";
+    }
+
+
+    // Issue book
+    void issueBook()
+    {
+        if (isAvailable)
+        {
+            isAvailable = false;
+            cout << "Book issued successfully.\n";
+        }
+        else
+        {
+            cout << "Book is already issued.\n";
+        }
+    }
+
+
+    // Return book
+    void returnBook()
+    {
+        if (!isAvailable)
+        {
+            isAvailable = true;
+            cout << "Book returned successfully.\n";
+        }
+        else
+        {
+            cout << "Book is already available.\n";
+        }
+    }
+};
+
+
+int main()
+{
+    // Default constructor
+    Book b1;
+
+    // Parameterized constructor
+    Book b2(101, "CPP", "Bjarne", true);
+
+    cout << "\n===== BOOK 1 =====";
+    b1.displayBook();
+
+    cout << "\n===== BOOK 2 =====";
+    b2.displayBook();
+
+    cout << "\nIssuing Book 101...\n";
+    b2.issueBook();
+
+    b2.displayBook();
+
+    cout << "\nTrying to issue Book 101 again...\n";
+    b2.issueBook();
+
+    cout << "\nReturning Book 101...\n";
+    b2.returnBook();
+
+    b2.displayBook();
+
+    return 0;
+}
+------------------------------------------------------
+/*
+Q.4: Write a C++ program to implement a Student Result Management System using a
+class Student. The program should use a parameterized constructor to initialize
+student details, a destructor to display a message when objects are destroyed, a
+static variable to count the number of students, and a static function to display the
+count. Store the details of 5 students using an array of objects. Calculate total marks
+and percentage for each student and display the student with the highest
+percentage.
+*/
+#include <iostream>
+#include <string>
+using namespace std;
+
+class Student
+{
+    int studentId;
+    string name;
+
+    int marks1;
+    int marks2;
+    int marks3;
+
+    int total;
+    float percentage;
+
+    static int count;
+
+public:
+
+    // Parameterized constructor
+    Student(int id, string n, int m1, int m2, int m3)
+    {
+        studentId = id;
+        name = n;
+
+        marks1 = m1;
+        marks2 = m2;
+        marks3 = m3;
+
+        total = marks1 + marks2 + marks3;
+        percentage = total / 3.0;
+
+        count++;
+    }
+
+
+    // Destructor
+    ~Student()
+    {
+        cout << "Student object destroyed: "
+             << studentId << endl;
+    }
+
+
+    // Display student details
+    void display()
+    {
+        cout << "\nStudent ID : " << studentId;
+        cout << "\nName       : " << name;
+        cout << "\nMarks      : "
+             << marks1 << " "
+             << marks2 << " "
+             << marks3;
+
+        cout << "\nTotal      : " << total;
+        cout << "\nPercentage : " << percentage << "%";
+
+        cout << "\n-----------------------------";
+    }
+
+
+    // Return percentage
+    float getPercentage()
+    {
+        return percentage;
+    }
+
+
+    // Return student name
+    string getName()
+    {
+        return name;
+    }
+
+
+    // Static function
+    static void displayCount()
+    {
+        cout << "\nTotal Students = "
+             << count << endl;
+    }
+};
+
+
+// Static data member definition
+int Student::count = 0;
+
+
+int main()
+{
+    Student s[5] =
+    {
+        Student(101, "Rahul", 80, 75, 90),
+        Student(102, "Amit", 70, 85, 78),
+        Student(103, "Priya", 95, 92, 90),
+        Student(104, "Neha", 82, 88, 85),
+        Student(105, "Rohan", 75, 80, 72)
+    };
+
+
+    cout << "\n===== STUDENT RESULTS =====\n";
+
+    for(int i = 0; i < 5; i++)
+    {
+        s[i].display();
+    }
+
+
+    // Display student count
+    Student::displayCount();
+
+
+    // Find highest percentage
+    int highestIndex = 0;
+
+    for(int i = 1; i < 5; i++)
+    {
+        if(s[i].getPercentage() >
+           s[highestIndex].getPercentage())
+        {
+            highestIndex = i;
+        }
+    }
+
+
+    cout << "\n\n===== HIGHEST PERCENTAGE =====";
+
+    cout << "\nStudent Name : "
+         << s[highestIndex].getName();
+
+    cout << "\nPercentage   : "
+         << s[highestIndex].getPercentage()
+         << "%\n";
+
+
+    return 0;
+}
+----------------------------------------------------------
+/*
+Q.5:  Employee Management System
+Problem statement
+Develop a menu-driven Employee Management system using c++
+create a class named Employee with the following data members:
+Employee Id, employee name, department, basic salary, years of experience
+The class should contain:
+-A default constructor to initialize employee data.
+-A parametrized constructor to initialize an employee with given values.
+-A destructor to display a message when an employee object is destroyed
+-A member fuction input() to accept employee details
+-A member function display() to display employee details
+-A member function to calculate the gross salary
+-A member function to search for an Employee using employee Id
+use an array of objects to store multiple employee records
+Menu options:
+the program should provide:
+add employee
+display all employees
+search employee
+calcualte gross salary
+*/
+
+#include <iostream>
+#include <string>
+using namespace std;
+
+class Employee
+{
+    int employeeId;
+    string employeeName;
+    string department;
+    double basicSalary;
+    int yearsExperience;
+
+public:
+
+    // Default constructor
+    Employee()
+    {
+        employeeId = 0;
+        employeeName = "Unknown";
+        department = "Unknown";
+        basicSalary = 0;
+        yearsExperience = 0;
+    }
+
+
+    // Parameterized constructor
+    Employee(int id, string name, string dept,
+             double salary, int exp)
+    {
+        employeeId = id;
+        employeeName = name;
+        department = dept;
+        basicSalary = salary;
+        yearsExperience = exp;
+    }
+
+
+    // Destructor
+    ~Employee()
+    {
+        cout << "Employee object destroyed: "
+             << employeeId << endl;
+    }
+
+
+    // Input employee details
+    void input()
+    {
+        cout << "\nEnter Employee ID: ";
+        cin >> employeeId;
+
+        cout << "Enter Employee Name: ";
+        cin >> employeeName;
+
+        cout << "Enter Department: ";
+        cin >> department;
+
+        cout << "Enter Basic Salary: ";
+        cin >> basicSalary;
+
+        cout << "Enter Years of Experience: ";
+        cin >> yearsExperience;
+    }
+
+
+    // Display employee details
+    void display()
+    {
+        cout << "\nEmployee ID       : " << employeeId;
+        cout << "\nEmployee Name     : " << employeeName;
+        cout << "\nDepartment        : " << department;
+        cout << "\nBasic Salary      : " << basicSalary;
+        cout << "\nYears Experience  : " << yearsExperience;
+
+        cout << "\n-----------------------------";
+    }
+
+
+    // Calculate gross salary
+    double grossSalary()
+    {
+        // Example: 20% allowance
+        double gross = basicSalary +
+                       (0.20 * basicSalary);
+
+        return gross;
+    }
+
+
+    // Search employee by ID
+    bool search(int id)
+    {
+        if(employeeId == id)
+            return true;
+
+        return false;
+    }
+};
+
+
+int main()
+{
+    Employee emp[5];
+
+    int choice;
+
+    do
+    {
+        cout << "\n\n========== EMPLOYEE MANAGEMENT SYSTEM ==========";
+        cout << "\n1. Add Employee";
+        cout << "\n2. Display All Employees";
+        cout << "\n3. Search Employee";
+        cout << "\n4. Calculate Gross Salary";
+        cout << "\n5. Exit";
+
+        cout << "\nEnter choice: ";
+        cin >> choice;
+
+
+        switch(choice)
+        {
+        case 1:
+
+            for(int i = 0; i < 5; i++)
+            {
+                cout << "\nEnter details for Employee "
+                     << i + 1 << ":\n";
+
+                emp[i].input();
+            }
+
+            cout << "\nEmployee records added successfully.";
+            break;
+
+
+        case 2:
+
+            cout << "\n===== ALL EMPLOYEES =====";
+
+            for(int i = 0; i < 5; i++)
+            {
+                emp[i].display();
+            }
+
+            break;
+
+
+        case 3:
+        {
+            int id;
+            bool found = false;
+
+            cout << "\nEnter Employee ID to search: ";
+            cin >> id;
+
+            for(int i = 0; i < 5; i++)
+            {
+                if(emp[i].search(id))
+                {
+                    cout << "\nEmployee Found:\n";
+                    emp[i].display();
+
+                    found = true;
+                    break;
+                }
+            }
+
+            if(!found)
+            {
+                cout << "\nEmployee not found.";
+            }
+
+            break;
+        }
+
+
+        case 4:
+        {
+            int id;
+            bool found = false;
+
+            cout << "\nEnter Employee ID: ";
+            cin >> id;
+
+            for(int i = 0; i < 5; i++)
+            {
+                if(emp[i].search(id))
+                {
+                    cout << "\nGross Salary = "
+                         << emp[i].grossSalary();
+
+                    found = true;
+                    break;
+                }
+            }
+
+            if(!found)
+            {
+                cout << "\nEmployee not found.";
+            }
+
+            break;
+        }
+
+
+        case 5:
+            cout << "\nThank you!";
+            break;
+
+
+        default:
+            cout << "\nInvalid choice!";
+        }
+
+    } while(choice != 5);
+
+
+    return 0;
+}
+-----------------------------------------------------
+/*
+Q.6: Create a base class Person containing name and age. Derive two classes, Student and
+Employee, from Person.
+Then create a class TeachingAssistant that inherits from both Student and Employee. The
+TeachingAssistant should store student roll number and employee ID and display all available
+information.
+Use virtual inheritance to avoid ambiguity caused by the diamond structure.
+Inheritance type: Hybrid inheritance
+Classes:
+Person
+/ \
+Student Employee
+\ /
+TeachingAssistant
+Example Input:
+Name: Rahul
+Age: 22
+Roll No: 101
+Employee ID: TA501
+*/
+
+#include <iostream>
+#include <string>
+using namespace std;
+
+
+// Base class
+class Person
+{
+protected:
+    string name;
+    int age;
+
+public:
+
+    Person(string n = "", int a = 0)
+    {
+        name = n;
+        age = a;
+    }
+};
+
+
+// First derived class
+class Student : virtual public Person
+{
+protected:
+    int rollNo;
+
+public:
+
+    Student(string n = "", int a = 0, int r = 0)
+        : Person(n, a)
+    {
+        rollNo = r;
+    }
+};
+
+
+// Second derived class
+class Employee : virtual public Person
+{
+protected:
+    string employeeId;
+
+public:
+
+    Employee(string n = "", int a = 0, string id = "")
+        : Person(n, a)
+    {
+        employeeId = id;
+    }
+};
+
+
+// Multiple inheritance
+class TeachingAssistant : public Student, public Employee
+{
+public:
+
+    TeachingAssistant(string n, int a,
+                      int r, string id)
+        : Person(n, a),
+          Student(n, a, r),
+          Employee(n, a, id)
+    {
+    }
+
+
+    void display()
+    {
+        cout << "\n===== TEACHING ASSISTANT =====";
+        cout << "\nName        : " << name;
+        cout << "\nAge         : " << age;
+        cout << "\nRoll No     : " << rollNo;
+        cout << "\nEmployee ID : " << employeeId;
+    }
+};
+
+
+int main()
+{
+    TeachingAssistant ta(
+        "Rahul",
+        22,
+        101,
+        "TA501"
+    );
+
+    ta.display();
+
+    return 0;
+}
+------------------------------------------------------------
+/*
+Q.7: hybrid inheritance
+base class student
+derived class virtual test and virtual sports
+derived derived class Result
+here test and sport both inherit from student virtuality
+class test: virtual public student
+class sports: virtual public student
+therefore result gets only one copy of student and rollno is not ambiguous
+this is the classic student->test, sports ->result example of virtual base class
+*/
+#include <iostream>
+#include <string>
+using namespace std;
+
+
+// Base class
+class Student
+{
+protected:
+    int rollNo;
+    string name;
+
+public:
+
+    Student(int r = 0, string n = "")
+    {
+        rollNo = r;
+        name = n;
+    }
+};
+
+
+// Test inherits virtually from Student
+class Test : virtual public Student
+{
+protected:
+    int testMarks;
+
+public:
+
+    Test(int r = 0, string n = "", int marks = 0)
+        : Student(r, n)
+    {
+        testMarks = marks;
+    }
+};
+
+
+// Sports inherits virtually from Student
+class Sports : virtual public Student
+{
+protected:
+    int sportsMarks;
+
+public:
+
+    Sports(int r = 0, string n = "", int marks = 0)
+        : Student(r, n)
+    {
+        sportsMarks = marks;
+    }
+};
+
+
+// Result inherits from both Test and Sports
+class Result : public Test, public Sports
+{
+public:
+
+    Result(int r, string n,
+           int test, int sports)
+        : Student(r, n),
+          Test(r, n, test),
+          Sports(r, n, sports)
+    {
+    }
+
+
+    void display()
+    {
+        cout << "\n===== STUDENT RESULT =====";
+
+        cout << "\nRoll No      : " << rollNo;
+        cout << "\nName         : " << name;
+        cout << "\nTest Marks   : " << testMarks;
+        cout << "\nSports Marks : " << sportsMarks;
+
+        cout << "\nTotal        : "
+             << testMarks + sportsMarks;
+    }
+};
+
+
+int main()
+{
+    Result r(
+        101,
+        "Rahul",
+        85,
+        90
+    );
+
+    r.display();
+
+    return 0;
+}
